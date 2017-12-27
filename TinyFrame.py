@@ -1,19 +1,3 @@
-class TF_Msg:
-    def __init__(self):
-        self.data = bytearray()
-        self.len = 0
-        self.type = 0
-        self.id = 0
-
-    def __str__(self):
-        return f"ID {self.id:X}h, type {self.type:X}h, len {self.len:d}, body: {self.data}"
-
-class TF:
-    STAY = 'STAY'
-    RENEW = 'RENEW'
-    CLOSE = 'CLOSE'
-    NEXT = 'NEXT'
-
 class TinyFrame:
     def __init__(self, peer=1):
         self.write = None # the writer function should be attached here
@@ -349,19 +333,18 @@ class TinyFrame:
             'fn': lst,
         }
 
+class TF_Msg:
+    def __init__(self):
+        self.data = bytearray()
+        self.len = 0
+        self.type = 0
+        self.id = 0
 
+    def __str__(self):
+        return f"ID {self.id:X}h, type {self.type:X}h, len {self.len:d}, body: {self.data}"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class TF:
+    STAY = 'STAY'
+    RENEW = 'RENEW'
+    CLOSE = 'CLOSE'
+    NEXT = 'NEXT'
