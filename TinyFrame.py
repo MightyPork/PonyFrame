@@ -13,12 +13,22 @@ class TinyFrame:
         #  If the connection is reliable, you can disable the SOF byte and checksums.
         #  That can save up to 9 bytes of overhead.
 
-        #  ,-----+----+-----+------+------------+- - - -+------------,
-        #  | SOF | ID | LEN | TYPE | HEAD_CKSUM | DATA  | PLD_CKSUM  |
-        #  | 1   | ?  | ?   | ?    | ?          | ...   | ?          | <- size (bytes)
-        #  '-----+----+-----+------+------------+- - - -+------------'
+        # ,-----+-----+-----+------+------------+- - - -+-------------,
+        # | SOF | ID  | LEN | TYPE | HEAD_CKSUM | DATA  | DATA_CKSUM  |
+        # | 0-1 | 1-4 | 1-4 | 1-4  | 0-4        | ...   | 0-4         | <- size (bytes)
+        # '-----+-----+-----+------+------------+- - - -+-------------'
+        #
+        # SOF ......... start of frame, usually 0x01 (optional, configurable)
+        # ID  ......... the frame ID (MSb is the peer bit)
+        # LEN ......... number of data bytes in the frame
+        # TYPE ........ message type (used to run Type Listeners, pick any values you like)
+        # HEAD_CKSUM .. header checksum
+        #
+        # DATA ........ LEN bytes of data (can be 0, in which case DATA_CKSUM is omitted as well)
+        # DATA_CKSUM .. checksum, implemented as XOR of all preceding bytes in the message
 
         #  !!! BOTH SIDES MUST USE THE SAME SETTINGS !!!
+        # Settings can be adjusted by setting the properties after init
 
         #  Adjust sizes as desired (1,2,4)
         self.ID_BYTES = 2
@@ -279,7 +289,7 @@ class TinyFrame:
         if frame.id in self.id_listeners and self.id_listeners[frame.id] is not None:
             lst = self.id_listeners[frame.id]
             rv = lst['fn'](self, frame)
-            if rv == TF.CLOSE:
+            if rv == TF.CLOSE or rv is None:
                 self.id_listeners[frame.id] = None
                 return
             elif rv == TF.RENEW:
