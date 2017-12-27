@@ -59,7 +59,7 @@ class TinyFrame:
         elif self.CKSUM_TYPE == 'crc16':
             return 2
         elif self.CKSUM_TYPE == 'crc32':
-            return 2
+            return 4
         else:
             raise Exception("Bad cksum type!")
 
@@ -74,9 +74,11 @@ class TinyFrame:
             return (~acc) & ((1<<(self._CKSUM_BYTES*8))-1)
 
         elif self.CKSUM_TYPE == 'crc16':
+            # TODO implement crc16
             raise Exception("CRC16 not implemented!")
 
         elif self.CKSUM_TYPE == 'crc32':
+            # TODO implement crc32
             raise Exception("CRC32 not implemented!")
 
         else:
@@ -161,6 +163,8 @@ class TinyFrame:
             self.accept_byte(b)
 
     def accept_byte(self, b):
+        # TODO this seems ripe for rewrite to avoid repetitive code
+
         if self.ps == 'SOF':
             if self.USE_SOF_BYTE:
                 if b != self.SOF_BYTE:
@@ -334,6 +338,7 @@ class TinyFrame:
         }
 
 class TF_Msg:
+    """ A TF message object """
     def __init__(self):
         self.data = bytearray()
         self.len = 0
@@ -344,6 +349,7 @@ class TF_Msg:
         return f"ID {self.id:X}h, type {self.type:X}h, len {self.len:d}, body: {self.data}"
 
 class TF:
+    """ Constants """
     STAY = 'STAY'
     RENEW = 'RENEW'
     CLOSE = 'CLOSE'
