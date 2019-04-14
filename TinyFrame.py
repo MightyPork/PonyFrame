@@ -1,3 +1,5 @@
+import binascii
+
 class TinyFrame:
     def __init__(self, peer:int=1):
         self.write = None # the writer function should be attached here
@@ -89,8 +91,7 @@ class TinyFrame:
             raise Exception("CRC16 not implemented!")
 
         elif self.CKSUM_TYPE == 'crc32':
-            # TODO implement crc32
-            raise Exception("CRC32 not implemented!")
+            return binascii.crc32(buffer)
 
         else:
             raise Exception("Bad cksum type!")
