@@ -64,6 +64,39 @@ class TinyFrame:
         # received frame
         self.rf = TF_Msg()
 
+    def _reflect(self, num, width):
+        """Reverts bit order of the given number
+
+        Args:
+            num (int): Number that should be reflected
+            width (int): Size of the number in bits
+        """
+        reflected = 0
+
+        for i in range(width):
+            if (num >> i) & 1 != 0:
+                reflected |= 1 << (width - 1 - i)
+
+        return reflected
+
+    def _crc16(self, data: bytes):
+        xor_in = 0x0000  # initial value
+        xor_out = 0x0000  # final XOR value
+        poly = 0x8005  # generator polinom (normal form)
+
+        reg = xor_in
+        for byte in data:
+            cur_byte = self._reflect(byte, 8)
+            for i in range(8):
+                topbit = reg & 0x8000
+                if cur_byte & (0x80 >> i):
+                    topbit ^= 0x8000
+                reg <<= 1
+                if topbit:
+                    reg ^= poly
+            reg &= 0xFFFF
+        return self._reflect(reg ^ xor_out, 16)
+
     def _calc_cksum_bytes(self):
         if self.CKSUM_TYPE == 'none' or self.CKSUM_TYPE is None:
             return 0
@@ -87,8 +120,7 @@ class TinyFrame:
             return (~acc) & ((1<<(self._CKSUM_BYTES*8))-1)
 
         elif self.CKSUM_TYPE == 'crc16':
-            # TODO implement crc16
-            raise Exception("CRC16 not implemented!")
+            return self._crc16(buffer)
 
         elif self.CKSUM_TYPE == 'crc32':
             return binascii.crc32(buffer)
