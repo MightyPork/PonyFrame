@@ -146,11 +146,11 @@ class TinyFrame:
 
     def _pack(self, num:int, bytes:int) -> bytes:
         """ Pack a number for a TF field """
-        return num.to_bytes(bytes, byteorder='big', signed=False)
+        return num.to_bytes(bytes, 'big', signed=False)
 
     def _unpack(self, buf) -> int:
         """ Unpack a number from a TF field """
-        return int.from_bytes(buf, byteorder='big', signed=False)
+        return int.from_bytes(buf, 'big', signed=False)
 
     def query(self, type:int, listener, pld=None, id:int=None):
         """ Send a query """
